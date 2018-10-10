@@ -11,8 +11,10 @@ class ArtistService extends EventEmitter {
         };
     }
     getAllArtists() {
-        // Your implementation goes here
-        // Should emit a GET_ALL_ARTISTS event when the data is available
+        Artist.find({}, (err, artists) => {
+            if (err) { throw new Error(err); }
+            this.emit(this.events.GET_ALL_ARTISTS, artists);
+        });
     };
 
     getArtistById(id) {
@@ -25,9 +27,11 @@ class ArtistService extends EventEmitter {
         })
     };
 
-    createArtist() {
-        // Your implementation goes here
-        // Should emit a CREATE_ARTIST event when the data is available
+    createArtist( artist ) {
+        Artist.create(artist, err => {
+            if (err) { throw new Error(err); }
+            this.emit(this.events.CREATE_ARTIST, 201)
+        })
     };
 };
 

@@ -17,6 +17,11 @@ class AuctionService extends EventEmitter {
 	getAllAuctions() {
 		// Your implementation goes here
         // Should emit a GET_ALL_AUCTIONS event when the data is available
+      Auction.find({}, (err, auctions) => {
+        if (err) { throw new Error(err); }
+        console.log(auctions);
+        this.emit(this.events.GET_ALL_AUCTIONS, auctions);
+    });
 	};
 
 	getAuctionById(id) {

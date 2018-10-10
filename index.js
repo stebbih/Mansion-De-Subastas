@@ -7,6 +7,7 @@ const port = 3000;
 const ArtService = require('./services/artService');
 const ArtistService = require('./services/artistService');
 const AuctionService = require('./services/auctionService');
+const CustomerService = require('./services/customerService');
 
 app.use(bodyParser.json());
 
@@ -35,8 +36,12 @@ app.post('/api/arts', (req, res) => {
 });
 
 //getAllArtists
-app.get('/api/artist', (req, res) => {
-    return res.send();
+app.get('/api/artists', (req, res) => {
+    const artistService = new ArtistService();
+    artistService.on(artistService.events.GET_ALL_ARTISTS, data =>{
+        return res.json(data);
+    });
+    artistService.getAllArtists();
 })
 
 //getArtistById
@@ -51,17 +56,31 @@ app.get('/api/artists/:id', (req, res) => {
 
 //createNewArtist
 app.post('/api/artists', (req, res) => {
-    return res.send();
+    const artist = req.body;
+    const artistService = new ArtistService();
+    artistService.on(artistService.events.CREATE_ARTIST, data => {
+        return res.send(data);
+    });
+    artistService.createArtist(artist);
 });
 
 //getAllCustomers
 app.get('/api/customers', (req, res)  => {
-    return res.send();
+  const customerService = new CustomerService();
+  customerService.on(customerService.events.GET_ALL_CUSTOMERS, data =>{
+      return res.json(data);
+  });
+  customerService.getAllCustomers();
 });
 
 //getCustomersById
 app.get('/api/customers/:id', (req, res) => {
-    return res.send();
+  const id = req.params.id;
+  const customerService = new CustomerService();
+  customerService.on(customerService.events.GET_CUSTOMER_BY_ID, data => {
+    return res.json(data);
+  })
+  customerService.getCustomerById(id);
 });
 
 //createNewCustomer
@@ -76,7 +95,11 @@ app.get('/api/customers/:id/auction-bids', (req, res) => {
 
 //getAllAuction
 app.get('/api/auctions', (req, res) => {
-    return res.send();
+  const auctionService = new AuctionService();
+  auctionService.on(auctionService.events.GET_ALL_AUCTIONS, data =>{
+      return res.json(data);
+  });
+  auctionService.getAllAuctions();
 });
 
 //getAuctionsById
