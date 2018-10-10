@@ -5,6 +5,8 @@ const bodyParser = require('body-parser')
 const port = 3000;
 
 const ArtService = require('./services/artService');
+const ArtistService = require('./services/artistService');
+const AuctionService = require('./services/auctionService');
 
 app.use(bodyParser.json());
 
@@ -19,7 +21,12 @@ app.get('/api/arts', (req, res)  => {
 
 //getArtsById
 app.get('/api/arts/:id', (req, res) => {
-    return res.send();
+  const id = req.params.id;
+    const artService = new ArtService();
+    artService.on(artService.events.GET_ART_BY_ID, data => {
+      return res.json(data);
+    })
+    artService.getArtById(id);
 });
 
 //createNewArts
@@ -34,7 +41,12 @@ app.get('/api/artist', (req, res) => {
 
 //getArtistById
 app.get('/api/artists/:id', (req, res) => {
-    return res.send();
+  const id = req.params.id;
+  const artistService = new ArtistService();
+  artistService.on(artistService.events.GET_ARTIST_BY_ID, data => {
+    return res.json(data);
+  })
+  artistService.getArtistById(id);
 });
 
 //createNewArtist
@@ -69,7 +81,12 @@ app.get('/api/auctions', (req, res) => {
 
 //getAuctionsById
 app.get('/api/auctions/:id', (req, res) => {
-    return res.send();
+  const id = req.params.id;
+  const auctionService = new AuctionService();
+  auctionService.on(auctionService.events.GET_AUCTION_BY_ID, data => {
+    return res.json(data);
+  })
+  auctionService.getAuctionById(id);
 });
 
 //getAuctionWinner

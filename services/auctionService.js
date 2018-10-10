@@ -1,4 +1,5 @@
 EventEmitter = require('events');
+const Auction = require('../data/db').Auction;
 
 class AuctionService extends EventEmitter {
 	constructor() {
@@ -21,6 +22,11 @@ class AuctionService extends EventEmitter {
 	getAuctionById(id) {
 		// Your implementation goes here
         // Should emit a GET_AUCTION_BY_ID event when the data is available
+    Auction.findById(id, (err, auction) => {
+      if (err) { throw new Error(err); }
+      console.log(auction);
+      this.emit(this.events.GET_AUCTION_BY_ID, auction);
+    })
 	};
 
 	getAuctionWinner(auctionId) {
