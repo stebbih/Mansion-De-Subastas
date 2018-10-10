@@ -5,6 +5,7 @@ const bodyParser = require('body-parser')
 const port = 3000;
 
 const ArtService = require('./services/artService');
+const ArtistService = require('./services/ArtistService');
 
 app.use(bodyParser.json());
 
@@ -28,8 +29,12 @@ app.post('/api/arts', (req, res) => {
 });
 
 //getAllArtists
-app.get('/api/artist', (req, res) => {
-    return res.send();
+app.get('/api/artists', (req, res) => {
+    const artistService = new ArtistService();
+    artistService.on(artistService.events.GET_ALL_ARTISTS, data =>{
+        return res.json(data);
+    });
+    artistService.getAllArtists();
 })
 
 //getArtistById
@@ -39,7 +44,12 @@ app.get('/api/artists/:id', (req, res) => {
 
 //createNewArtist
 app.post('/api/artists', (req, res) => {
-    return res.send();
+    const artist = req.body;
+    const artistService = new ArtistService();
+    artistService.on(artistService.events.CREATE_ARTIST, data => {
+        return res.send(data);
+    });
+    artistService.createArtist(artist);
 });
 
 //getAllCustomers
