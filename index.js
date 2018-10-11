@@ -135,11 +135,26 @@ app.get('/api/auctions/:id', (req, res) => {
 
 //getAuctionWinner
 app.get('/api/auctions/:id/winner', (req, res) => {
-//   Gets the winner of the auction. If the auction is not
-// finished the web service should return a status code 409 (Conflict), otherwise it
+
 // should return the customer which holds the highest bid. If the auction had no bids, it
-// should return a status code 200 (OK) with the message: ‘This auction had no bids.’.  
-  return res.send();
+// should return a status code 200 (OK) with the message: ‘This auction had no bids.’.
+  const id = req.params.id;
+  const auctionService = new AuctionService();
+  auctionService.on(auctionService.events.AUCTION_HAS_NOT_EXPIRED, err => {
+    return res.send(409);
+  });
+  auctionService.on(auctionService.events.AUCTION_HAS_NO_BIDS, data => {
+    return res.send(200);
+  });
+  auctionService.on(auctionService.events.GET_AUCTION_WINNER, data => {
+    return res.json(data);
+  });
+  auctionService.on(auctionService.events.AUCTION_ERROR, err => {
+    return res.send(400);
+  })
+  auctionService.getAuctionWinner(id);
+
+
 });
 
 //createNewAuction
@@ -161,7 +176,15 @@ app.post('/api/auctions', (req, res) => {
 //getAllBidsForAuction
 app.get('/api/auctions/:id/bids', (req, res) => {
   // Gets all auction bids associated with an auction
-    return res.send();
+  const id = req.params.id;
+  const auctionService = new AuctionService();
+  auctionService.on(auctionService.events.GET_AUCTION_BIDS_WITHIN_AUCTION, data => {
+    return res.json(data);
+  });
+  auctionService.on(auctionService.events.GET_AUCTION_BIDS_WITHIN_AUCTION_ERROR, err => {
+    return res.send(400);
+  })
+  auctionService.getAuctionBidsWithinAuction(id);
 });
 
 //createNewBidOnAuction
@@ -174,7 +197,16 @@ app.post('/api/auctions/:id/bids', (req, res) => {
   // service should return a status code 403 (Forbidden). As a side-effect the
   // auctionWinner property in the Auction schema should be updated to the latest
   // highest bidder.
-    return res.send();
+  const bid = req.body;
+  const auctionService = new AuctionService();
+  auctionService.on(auctionService.events.AUCTION_ERROR, err => {
+    return res.send(412);
+  });
+  auctionService.on(auctionService.events.PLACE_NEW_BID, val => {
+    return res.send(201);
+  });
+  auctionService.placeNewBid(bid);
+
 });
 
 
