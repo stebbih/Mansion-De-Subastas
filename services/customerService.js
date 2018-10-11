@@ -33,7 +33,7 @@ class CustomerService extends EventEmitter {
         // Should emit a GET_CUSTOMER_AUCTION_BIDS event when the data is available
       console.log(customerId);
 
-        AuctionBid.find({'customerId': customerId}, (err, auction) => {
+        AuctionBid.find({customerId: customerId}, (err, auction) => {
         if (err) { throw new Error(err); }
         this.emit(this.events.GET_CUSTOMER_AUCTION_BIDS, auction);
       })
