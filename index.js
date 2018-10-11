@@ -144,7 +144,18 @@ app.get('/api/auctions/:id/winner', (req, res) => {
 
 //createNewAuction
 app.post('/api/auctions', (req, res) => {
-    return res.send();
+    const auction = req.body;
+    const auctionService = new AuctionService();
+    auctionService.on(auctionService.events.CREATE_AUCTION, data => {
+      return res.send(201);
+    })
+    auctionService.on(auctionService.events.CREATE_AUCTION_ERROR, err => {
+      return res.send(412);
+    })
+    auctionService.on(auctionService.events.ART_ID_ERROR, err => {
+      return res.send(400);
+    })
+    auctionService.createAuction(auction);
 });
 
 //getAllBidsForAuction

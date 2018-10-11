@@ -21,8 +21,6 @@ class CustomerService extends EventEmitter {
     };
 
     getCustomerById(id) {
-        // Your implementation goes here
-        // Should emit a GET_CUSTOMER_BY_ID event when the data is available
         Customer.findById(id, (err, customers) => {
           if (err) { throw new Error(err); }
           // Eitthvad ad, faum bara tomt id til baka, kannski af thvi thad vantar gogn
@@ -44,7 +42,7 @@ class CustomerService extends EventEmitter {
     createCustomer(customer) {
         Customer.create(customer, err => {
             if (err) { throw new Error(err); }
-            this.emit(this.events.CREATE_CUSTOMER, 200);
+            this.emit(this.events.CREATE_CUSTOMER);
         })
     };
 };
