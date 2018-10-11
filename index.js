@@ -34,10 +34,10 @@ app.get('/api/arts/:id', (req, res) => {
 app.post('/api/arts', (req, res) => {
   const art = req.body;
   const artService = new ArtService();
-  artService.on(artService.events.CREATE_ART, data => {
+  artService.on(artService.events.CREATE_ART, () => {
       return res.send(201);
   });
-  artService.on(artService.events.CREATE_ART_ERROR, err => {
+  artService.on(artService.events.CREATE_ART_ERROR, () => {
     return res.send(400);
   })
   artService.createArt(art);
@@ -66,10 +66,10 @@ app.get('/api/artists/:id', (req, res) => {
 app.post('/api/artists', (req, res) => {
     const artist = req.body;
     const artistService = new ArtistService();
-    artistService.on(artistService.events.CREATE_ARTIST, data => {
+    artistService.on(artistService.events.CREATE_ARTIST, () => {
         return res.send(201);
     });
-    artistService.on(artistService.events.CREATE_ARTIST_ERROR, error => {
+    artistService.on(artistService.events.CREATE_ARTIST_ERROR, () => {
       return res.sendStatus(412);
     });
     artistService.createArtist(artist);
@@ -140,16 +140,16 @@ app.get('/api/auctions/:id/winner', (req, res) => {
 // should return a status code 200 (OK) with the message: ‘This auction had no bids.’.
   const id = req.params.id;
   const auctionService = new AuctionService();
-  auctionService.on(auctionService.events.AUCTION_HAS_NOT_EXPIRED, err => {
+  auctionService.on(auctionService.events.AUCTION_HAS_NOT_EXPIRED, () => {
     return res.send(409);
   });
-  auctionService.on(auctionService.events.AUCTION_HAS_NO_BIDS, data => {
-    return res.send(200);
+  auctionService.on(auctionService.events.AUCTION_HAS_NO_BIDS, () => {
+    return res.send(data);
   });
   auctionService.on(auctionService.events.GET_AUCTION_WINNER, data => {
     return res.json(data);
   });
-  auctionService.on(auctionService.events.AUCTION_ERROR, err => {
+  auctionService.on(auctionService.events.AUCTION_ERROR, () => {
     return res.send(400);
   })
   auctionService.getAuctionWinner(id);
@@ -161,13 +161,13 @@ app.get('/api/auctions/:id/winner', (req, res) => {
 app.post('/api/auctions', (req, res) => {
     const auction = req.body;
     const auctionService = new AuctionService();
-    auctionService.on(auctionService.events.CREATE_AUCTION, data => {
+    auctionService.on(auctionService.events.CREATE_AUCTION, () => {
       return res.send(201);
     })
-    auctionService.on(auctionService.events.CREATE_AUCTION_ERROR, err => {
+    auctionService.on(auctionService.events.CREATE_AUCTION_ERROR, () => {
       return res.send(412);
     })
-    auctionService.on(auctionService.events.ART_ID_ERROR, err => {
+    auctionService.on(auctionService.events.ART_ID_ERROR, () => {
       return res.send(400);
     })
     auctionService.createAuction(auction);
@@ -179,9 +179,9 @@ app.get('/api/auctions/:id/bids', (req, res) => {
   const id = req.params.id;
   const auctionService = new AuctionService();
   auctionService.on(auctionService.events.GET_AUCTION_BIDS_WITHIN_AUCTION, data => {
-    return res.send(data);
+    return res.json(data);
   });
-  auctionService.on(auctionService.events.GET_AUCTION_BIDS_WITHIN_AUCTION_ERROR, err => {
+  auctionService.on(auctionService.events.GET_AUCTION_BIDS_WITHIN_AUCTION_ERROR, () => {
     return res.send(400);
   })
   auctionService.getAuctionBidsWithinAuction(id);
@@ -199,12 +199,15 @@ app.post('/api/auctions/:id/bids', (req, res) => {
   // highest bidder.
   const bid = req.body;
   const auctionService = new AuctionService();
-  auctionService.on(auctionService.events.AUCTION_ERROR, err => {
+  auctionService.on(auctionService.events.AUCTION_ERROR, () => {
     return res.send(412);
   });
-  auctionService.on(auctionService.events.PLACE_NEW_BID, val => {
+  auctionService.on(auctionService.events.PLACE_NEW_BID, () => {
     return res.send(201);
   });
+  auctionService.on(auctionService.events.AUCTION_HAS_EXPIRED, () => {
+    return res.send(403);
+  })
   auctionService.placeNewBid(bid);
 
 });

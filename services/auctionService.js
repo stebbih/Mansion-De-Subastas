@@ -21,6 +21,7 @@ class AuctionService extends EventEmitter {
 			ART_ID_ERROR: 'ART_ID_ERROR',
 			AUCTION_PRICE_ERROR: 'AUCTION_PRICE_ERROR',
 			AUCTION_ERROR: 'AUCTION_ERROR',
+			AUCTION_HAS_EXPIRED: 'AUCTION_HAS_EXPIRED'
 
 		};
 	}
@@ -42,10 +43,11 @@ class AuctionService extends EventEmitter {
 
 	getAuctionWinner(auctionId) {
 		var today = new Date();
+		console.log(today);
 		Auction.findById(auctionId, (err, auction) => {
 			if (err) { this.emit(this.events.AUCTION_ERROR); }
-			console.log(auction.auctionWinner);
-			if (auction.endDate > today) {
+			console.log(auction.endDate);
+			if (auction.endDate < today) {
 				if (auction.auctionWinner === null) {
 					this.emit(this.events.AUCTION_HAS_NO_BIDS);
 				}
@@ -81,7 +83,7 @@ class AuctionService extends EventEmitter {
 	getAuctionBidsWithinAuction(auctionId) {
 			AuctionBid.find({ auctionId: auctionId}, (err, bids) => {
 				if (err) { this.emit(this.events.GET_AUCTION_BIDS_WITHIN_AUCTION_ERROR); }
-				this.emit(this.events.GET_AUCTION_BIDS_WITHIN_AUCTION);
+				this.emit(this.events.GET_AUCTION_BIDS_WITHIN_AUCTION, bids);
 			});
 	};
 
@@ -90,32 +92,33 @@ class AuctionService extends EventEmitter {
 		const auctionId = theBid.auctionId;
 		const customerId = theBid.customerId;
 		let highestPrice = 0;
+		const today = new Date();
 		Auction.findById(auctionId, (err, auction) => {
 				if (err) { this.emit(this.events.AUCTION_ERROR); }
-				if (price <= auction.price) { this.emit(this.events.AUCTION_ERROR); }
-				AuctionBid.findById(auctionId, (err, bids) => {
-						if (err) { this.emit(this.events.AUCTION_ERROR); }
-						console.log(bids);
-						if (bids === null) {
-							AuctionBid.create({auctionId: auctionId, customerId: customerId, price: price}, err => {
-								if (err) { this.emit(this.events.AUCTION_ERROR); }
-								console.log('sixth');
-								Auction.update({_id: auction._id}, { $set: {auctionWinner: customerId}}, err => { if (err) { this.emit(this.events.AUCTION_ERROR); }})
-								this.emit(this.events.PLACE_NEW_BID);
-							});
-						}
-						else {
-							bids.forEach(bid => { if (bid.price > highestPrice) { highestPrice = bid.price } });
-							if (highestPrice > price) { this.emit(this.events.AUCTION_ERROR); }
-							AuctionBid.create({auctionId: auctionId, customerId: customerId, price: price}, err => {
-								console.log('fifth');
-								if (err) { this.emit(this.events.AUCTION_ERROR); }
-								console.log('sixth');
-								Auction.update({_id: auction._id}, { $set: {auctionWinner: customerId}}, err => { if (err) { this.emit(this.events.AUCTION_ERROR); }})
-								this.emit(this.events.PLACE_NEW_BID);
-							});
-						}
-				});
+				if (auction.endDate > today) { this.emit(this.events.AUCTION_HAS_EXPIRED); }
+				else {
+					if (price <= auction.price) { this.emit(this.events.AUCTION_ERROR); }
+					AuctionBid.findById(auctionId, (err, bids) => {
+							if (err) { this.emit(this.events.AUCTION_ERROR); }
+							console.log(bids);
+							if (bids === null) {
+								AuctionBid.create({auctionId: auctionId, customerId: customerId, price: price}, err => {
+									if (err) { this.emit(this.events.AUCTION_ERROR); }
+									Auction.update({_id: auction._id}, { $set: {auctionWinner: customerId}}, err => { if (err) { this.emit(this.events.AUCTION_ERROR); }})
+									this.emit(this.events.PLACE_NEW_BID);
+								});
+							}
+							else {
+								bids.forEach(bid => { if (bid.price > highestPrice) { highestPrice = bid.price } });
+								if (highestPrice > price) { this.emit(this.events.AUCTION_ERROR); }
+								AuctionBid.create({auctionId: auctionId, customerId: customerId, price: price}, err => {
+									if (err) { this.emit(this.events.AUCTION_ERROR); }
+									Auction.update({_id: auction._id}, { $set: {auctionWinner: customerId}}, err => { if (err) { this.emit(this.events.AUCTION_ERROR); }})
+									this.emit(this.events.PLACE_NEW_BID);
+								});
+							}
+					});
+				}
 		});
 	};
 };
