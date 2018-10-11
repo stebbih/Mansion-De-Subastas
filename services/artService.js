@@ -7,7 +7,8 @@ class ArtService extends EventEmitter {
         this.events = {
             GET_ALL_ARTS: 'GET_ALL_ARTS',
             GET_ART_BY_ID: 'GET_ART_BY_ID',
-            CREATE_ART: 'CREATE_ART'
+            CREATE_ART: 'CREATE_ART',
+            CREATE_ART_ERROR: 'CREATE_ART ERROR'
         };
     }
     getAllArts() {
@@ -31,8 +32,8 @@ class ArtService extends EventEmitter {
 
     createArt(art) {
         Art.create(art, err => {
-            if (err) { throw new Error(err); }
-            this.emit(this.events.CREATE_ART, '201');
+            if (err) { this.emit(this.events.CREATE_ART_ERROR,); }
+            this.emit(this.events.CREATE_ART,);
         })
     };
 };

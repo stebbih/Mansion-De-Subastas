@@ -7,7 +7,8 @@ class ArtistService extends EventEmitter {
         this.events = {
             GET_ALL_ARTISTS: 'GET_ALL_ARTISTS',
             GET_ARTIST_BY_ID: 'GET_ARTIST_BY_ID',
-            CREATE_ARTIST: 'CREATE_ARTIST'
+            CREATE_ARTIST: 'CREATE_ARTIST',
+            CREATE_ARTIST_ERROR: 'CREATE_ARTIST_ERROR'
         };
     }
     getAllArtists() {
@@ -29,8 +30,8 @@ class ArtistService extends EventEmitter {
 
     createArtist( artist ) {
         Artist.create(artist, err => {
-            if (err) { throw new Error(err); }
-            this.emit(this.events.CREATE_ARTIST, 201)
+            if (err) { this.emit(this.events.CREATE_ARTIST_ERROR,); }
+            this.emit(this.events.CREATE_ARTIST,)
         })
     };
 };

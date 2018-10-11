@@ -41,12 +41,12 @@ class AuctionService extends EventEmitter {
 
 	createAuction(auction) {
 		// Your implementation goes here
-        // Should emit a CREATE_AUCTION event when the data is available
+    // Should emit a CREATE_AUCTION event when the data is available
 	};
 
 	getAuctionBidsWithinAuction(auctionId) {
 		// Your implementation goes here
-        // Should emit a GET_AUCTION_BIDS_WITHIN_AUCTION event when the data is available
+    // Should emit a GET_AUCTION_BIDS_WITHIN_AUCTION event when the data is available
 	};
 
 	placeNewBid(auctionId, customerId, price) {
