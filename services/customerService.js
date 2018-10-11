@@ -1,5 +1,6 @@
 const EventEmitter = require('events');
 const Customer = require('../data/db').Customer;
+const AuctionBid = require('../data/db').AuctionBid;
 
 class CustomerService extends EventEmitter {
     constructor() {
@@ -19,8 +20,6 @@ class CustomerService extends EventEmitter {
     };
 
     getCustomerById(id) {
-        // Your implementation goes here
-        // Should emit a GET_CUSTOMER_BY_ID event when the data is available
         Customer.findById(id, (err, customers) => {
           if (err) { throw new Error(err); }
           this.emit(this.events.GET_CUSTOMER_BY_ID, customers);
@@ -28,14 +27,16 @@ class CustomerService extends EventEmitter {
     };
 
     getCustomerAuctionBids(customerId) {
-        // Your implementation goes here
-        // Should emit a GET_CUSTOMER_AUCTION_BIDS event when the data is available
+        AuctionBid.find({ customerId }, (err, customer) => {
+          if (err) { throw new Error(err); }
+            console.log(customer);
+        })
     };
 
     createCustomer(customer) {
         Customer.create(customer, err => {
             if (err) { throw new Error(err); }
-            this.emit(this.events.CREATE_CUSTOMER, '200');
+            this.emit(this.events.CREATE_CUSTOMER);
         })
     };
 };

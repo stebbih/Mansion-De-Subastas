@@ -1,5 +1,6 @@
 EventEmitter = require('events');
 const Auction = require('../data/db').Auction;
+const Art = require('../data/db').Art;
 
 class AuctionService extends EventEmitter {
 	constructor() {
@@ -9,24 +10,21 @@ class AuctionService extends EventEmitter {
 			GET_AUCTION_BY_ID: 'GET_AUCTION_BY_ID',
 			GET_AUCTION_WINNER: 'GET_AUCTION_WINNER',
 			CREATE_AUCTION: 'CREATE_AUCTION',
+			CREATE_AUCTION_ERROR: 'CREATE_ERROR',
 			GET_AUCTION_BIDS_WITHIN_AUCTION: 'GET_AUCTION_BIDS_WITHIN_AUCTION',
-			PLACE_NEW_BID: 'PLACE_NEW_BID'
+			PLACE_NEW_BID: 'PLACE_NEW_BID',
+			ART_ID_ERROR: 'ART_ID_ERROR'
 		};
 	}
 
 	getAllAuctions() {
-		// Your implementation goes here
-        // Should emit a GET_ALL_AUCTIONS event when the data is available
-      Auction.find({}, (err, auctions) => {
-        if (err) { throw new Error(err); }
-        console.log(auctions);
-        this.emit(this.events.GET_ALL_AUCTIONS, auctions);
+    Auction.find({}, (err, auctions) => {
+      if (err) { throw new Error(err); }
+      this.emit(this.events.GET_ALL_AUCTIONS, auctions);
     });
 	};
 
 	getAuctionById(id) {
-		// Your implementation goes here
-        // Should emit a GET_AUCTION_BY_ID event when the data is available
     Auction.findById(id, (err, auction) => {
       if (err) { throw new Error(err); }
       console.log(auction);
@@ -40,8 +38,20 @@ class AuctionService extends EventEmitter {
 	};
 
 	createAuction(auction) {
-		// Your implementation goes here
-        // Should emit a CREATE_AUCTION event when the data is available
+		console.log(auction.artId);
+		Art.findById(auction.artId, (err, art) => {
+			if (err) { this.emit(this.events.ART_ID_ERROR); }
+			if (art.isAuctionItem) {
+				Auction.create(auction, err => {
+						if (err) { this.emit(this.events.CREATE_AUCTION_ERROR); }
+						this.emit(this.events.CREATE_AUCTION);
+				});
+			}
+			else {
+				this.emit(this.events.CREATE_AUCTION_ERROR);
+			}
+		})
+
 	};
 
 	getAuctionBidsWithinAuction(auctionId) {
@@ -50,8 +60,9 @@ class AuctionService extends EventEmitter {
 	};
 
 	placeNewBid(auctionId, customerId, price) {
-		// Your implementation goes here
-        // Should emit a PLACE_NEW_BID event when the data is available
+
+		AuctionBid.create()
+
 	};
 };
 
