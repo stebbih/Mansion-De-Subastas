@@ -23,19 +23,19 @@ class CustomerService extends EventEmitter {
     getCustomerById(id) {
         Customer.findById(id, (err, customers) => {
           if (err) { throw new Error(err); }
-          // Eitthvad ad, faum bara tomt id til baka, kannski af thvi thad vantar gogn
           this.emit(this.events.GET_CUSTOMER_BY_ID, customers);
         })
     };
 
     getCustomerAuctionBids(customerId) {
-        // Your implementation goes here
+        // Your implementation goes here\
         // Should emit a GET_CUSTOMER_AUCTION_BIDS event when the data is available
-      console.log(customerId);
-
-        AuctionBid.find({'customerId': customerId}, (err, auction) => {
+                         
+        AuctionBid.find({customerId: customerId}, (err, auctions) => {
+          // console.log(auctions);
+        console.log(customerId);
         if (err) { throw new Error(err); }
-        this.emit(this.events.GET_CUSTOMER_AUCTION_BIDS, auction);
+        this.emit(this.events.GET_CUSTOMER_AUCTION_BIDS, auctions);
       })
     };
 

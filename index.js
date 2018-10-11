@@ -67,7 +67,7 @@ app.post('/api/artists', (req, res) => {
     const artist = req.body;
     const artistService = new ArtistService();
     artistService.on(artistService.events.CREATE_ARTIST, data => {
-        return res.send(201);
+        return res.sendStatus(201);
     });
     artistService.on(artistService.events.CREATE_ARTIST_ERROR, error => {
       return res.sendStatus(412);
